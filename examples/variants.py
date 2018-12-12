@@ -1,15 +1,16 @@
 import numpy as np
+import sys
 
 from rllab.misc.instrument import VariantGenerator
 from sac.misc.utils import flatten, get_git_rev, deep_update
 
-M = 256
+M = 128
 REPARAMETERIZE = True
 
 LSP_POLICY_PARAMS_BASE = {
     'type': 'lsp',
     'coupling_layers': 2,
-    's_t_layers': 1,
+    's_t_layers': 2,
     'action_prior': 'uniform',
     # 'preprocessing_hidden_sizes': None,
     'preprocessing_output_nonlinearity': 'relu',
@@ -206,7 +207,7 @@ ALGORITHM_PARAMS_BASE = {
 
 ALGORITHM_PARAMS = {
     'swimmer-rllab': { # 2 DoF
-        'scale_reward': 25,
+        'scale_reward': 100,
         'base_kwargs': {
             'n_epochs': 1e3,
         }
@@ -264,11 +265,11 @@ REPLAY_BUFFER_PARAMS = {
 SAMPLER_PARAMS = {
     'max_path_length': 1000,
     'min_pool_size': 1000,
-    'batch_size': 256,
+    'batch_size': 128,
 }
 
 RUN_PARAMS_BASE = {
-    'seed': [1,2,3,4,5],
+    'seed': [2, 3, 4, 5],
     'snapshot_mode': 'gap',
     'snapshot_gap': 1000,
     'sync_pkl': True,

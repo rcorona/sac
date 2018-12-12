@@ -1,5 +1,6 @@
 import argparse
 import os
+import sys
 
 import tensorflow as tf
 import numpy as np
@@ -28,6 +29,7 @@ from sac.misc.sampler import SimpleSampler
 from sac.replay_buffers import SimpleReplayBuffer
 from sac.value_functions import NNQFunction, NNVFunction
 from sac.preprocessors import MLPPreprocessor
+sys.path.insert(0,'/home/rcorona/sac/')
 from examples.variants import parse_domain_and_task, get_variants
 
 ENVIRONMENTS = {
@@ -209,7 +211,24 @@ def launch_experiments(variant_generator, args):
         experiment_prefix = variant['prefix'] + '/' + args.exp_name
         experiment_name = '{prefix}-{exp_name}-{i:02}'.format(
             prefix=variant['prefix'], exp_name=args.exp_name, i=i)
+        
+        ## Hacks to get it to work while we figure out code!
+        run_params['snapshot_gap'] = 200
+        #algo_params['base_kwargs']['n_epochs'] = 2000.0
+        log_dir = os.path.join(args.log_dir, experiment_name)
+        ## 
 
+        print('run params: {}'.format(variant['run_params']))
+        print('algorithm_params: {}'.format(variant['algorithm_params']))
+        print('env_params: {}'.format(variant['env_params']))
+        print('value_fn_params: {}'.format(variant['value_fn_params']))
+        print('replay_buffer_params: {}'.format(variant['replay_buffer_params']))
+        print('policy_params: {}'.format(variant['policy_params']))
+        print('sampler_params: {}'.format(variant['sampler_params']))
+        print('task: {}'.format(variant['task']))
+        #sys.exit()
+        
+        
         run_sac_experiment(
             run_experiment,
             mode=args.mode,
@@ -219,7 +238,7 @@ def launch_experiments(variant_generator, args):
             n_parallel=1,
             seed=run_params['seed'],
             terminate_machine=True,
-            log_dir=args.log_dir,
+            log_dir=log_dir, # RC: TODO change back to args.logdir
             snapshot_mode=run_params['snapshot_mode'],
             snapshot_gap=run_params['snapshot_gap'],
             sync_s3_pkl=run_params['sync_pkl'],
