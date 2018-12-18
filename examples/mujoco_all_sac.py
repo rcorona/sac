@@ -88,6 +88,12 @@ def parse_args():
     parser.add_argument('--exp_name', type=str, default=timestamp())
     parser.add_argument('--mode', type=str, default='local')
     parser.add_argument('--log_dir', type=str, default=None)
+
+    ## RC: Added to run time-complexity experiments.
+    parser.add_argument('--n_train_repeat', type=int, default=1)
+    parser.add_argument('--n_parallel', type=int, default=1)
+    parser.add_argument('--n_epochs', type=int, default=1000)
+    
     args = parser.parse_args()
 
     return args
@@ -191,9 +197,7 @@ def run_experiment(variant):
     )
 
     algorithm._sess.run(tf.global_variables_initializer())
-
     algorithm.train()
-
 
 def launch_experiments(variant_generator, args):
     variants = variant_generator.variants()
@@ -213,7 +217,8 @@ def launch_experiments(variant_generator, args):
             prefix=variant['prefix'], exp_name=args.exp_name, i=i)
         
         ## Hacks to get it to work while we figure out code!
-        run_params['snapshot_gap'] = 200
+        variant['algorithm_params']['base_kwargs']['n_train_repeat'] = args.n_train_repeat
+        variant['algorithm_params']['base_kwargs']['n_epochs'] = args.n_epochs
         #algo_params['base_kwargs']['n_epochs'] = 2000.0
         log_dir = os.path.join(args.log_dir, experiment_name)
         ## 
@@ -226,8 +231,6 @@ def launch_experiments(variant_generator, args):
         print('policy_params: {}'.format(variant['policy_params']))
         print('sampler_params: {}'.format(variant['sampler_params']))
         print('task: {}'.format(variant['task']))
-        #sys.exit()
-        
         
         run_sac_experiment(
             run_experiment,
@@ -235,7 +238,7 @@ def launch_experiments(variant_generator, args):
             variant=variant,
             exp_prefix=experiment_prefix,
             exp_name=experiment_name,
-            n_parallel=1,
+            n_parallel=args.n_parallel,
             seed=run_params['seed'],
             terminate_machine=True,
             log_dir=log_dir, # RC: TODO change back to args.logdir
