@@ -2,14 +2,16 @@ import tensorflow as tf
 from rllab import config
 
 
-def get_default_session():
-    return tf.get_default_session() or create_session()
+def get_default_session(**kwargs):
+    return tf.get_default_session() or create_session(**kwargs)
 
 
 def create_session(**kwargs):
     """ Create new tensorflow session with given configuration. """
+
     if "config" not in kwargs:
         kwargs["config"] = get_configuration()
+        
     return tf.InteractiveSession(**kwargs)
 
 
@@ -19,4 +21,5 @@ def get_configuration():
         raise NotImplementedError
 
     config_args = dict()
+
     return tf.ConfigProto(**config_args)

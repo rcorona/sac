@@ -10,6 +10,7 @@ from sac.core.serializable import deep_clone
 from sac.misc import tf_utils
 from sac.misc.sampler import rollouts
 
+import tensorflow as tf
 
 class RLAlgorithm(Algorithm):
     """Abstract RLAlgorithm.
@@ -28,7 +29,8 @@ class RLAlgorithm(Algorithm):
             eval_n_episodes=10,
             eval_deterministic=True,
             eval_render=False,
-            control_interval=1
+            control_interval=1,
+            gpu_fraction=1.0
     ):
         """
         Args:
@@ -56,7 +58,10 @@ class RLAlgorithm(Algorithm):
         self._eval_deterministic = eval_deterministic
         self._eval_render = eval_render
 
-        self._sess = tf_utils.get_default_session()
+        # Hack to get GPU fraction for parallelization.
+        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction)
+        config = tf.ConfigProto(gpu_options=gpu_options)
+        self._sess = tf_utils.get_default_session(config=config)
 
         self._env = None
         self._policy = None

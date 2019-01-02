@@ -5,6 +5,8 @@ import sys
 import tensorflow as tf
 import numpy as np
 
+from multiprocessing import Process
+
 from rllab.envs.normalized_env import normalize
 from rllab.envs.mujoco.gather.ant_gather_env import AntGatherEnv
 from rllab.envs.mujoco.swimmer_env import SwimmerEnv
@@ -93,6 +95,7 @@ def parse_args():
     parser.add_argument('--n_train_repeat', type=int, default=1)
     parser.add_argument('--n_parallel', type=int, default=1)
     parser.add_argument('--n_epochs', type=int, default=1000)
+    parser.add_argument('--gpu_fraction', type=float, default=1.0)
     
     args = parser.parse_args()
 
@@ -214,11 +217,13 @@ def launch_experiments(variant_generator, args):
 
         experiment_prefix = variant['prefix'] + '/' + args.exp_name
         experiment_name = '{prefix}-{exp_name}-{i:02}'.format(
-            prefix=variant['prefix'], exp_name=args.exp_name, i=i)
-        
+            prefix=variant['prefix'], exp_name=args.exp_name, i=args.seed)
+
         ## Hacks to get it to work while we figure out code!
         variant['algorithm_params']['base_kwargs']['n_train_repeat'] = args.n_train_repeat
         variant['algorithm_params']['base_kwargs']['n_epochs'] = args.n_epochs
+        variant['algorithm_params']['base_kwargs']['gpu_fraction'] = args.gpu_fraction
+        
         #algo_params['base_kwargs']['n_epochs'] = 2000.0
         log_dir = os.path.join(args.log_dir, experiment_name)
         ## 
@@ -239,7 +244,7 @@ def launch_experiments(variant_generator, args):
             exp_prefix=experiment_prefix,
             exp_name=experiment_name,
             n_parallel=args.n_parallel,
-            seed=run_params['seed'],
+            seed=args.seed,#run_params['seed'],
             terminate_machine=True,
             log_dir=log_dir, # RC: TODO change back to args.logdir
             snapshot_mode=run_params['snapshot_mode'],
@@ -248,9 +253,10 @@ def launch_experiments(variant_generator, args):
         )
 
 
-def main():
+def main(proc_id):
     args = parse_args()
-
+    args.seed = proc_id
+    
     domain, task = args.domain, args.task
     if (not domain) or (not task):
         domain, task = parse_domain_and_task(args.env)
@@ -260,4 +266,10 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # Hacks to run multiple session on a single GPU.
+    processes = [Process(target=main, args=(i,)) for i in range(4)]
+
+    for p in processes: p.start()
+    for p in processes: p.join()
+
+    #main()

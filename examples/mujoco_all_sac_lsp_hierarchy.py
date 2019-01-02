@@ -133,13 +133,13 @@ ENV_PARAMS = {
         'env_goal_distance': 5,
         'env_goal_angle_range': (0, 2*np.pi),
 
-        'low_level_policy_path': [
-            'multi-direction-humanoid-low-level-policy-2-00/itr_20000.pkl',
-            'multi-direction-humanoid-low-level-policy-2-01/itr_20000.pkl',
-            'multi-direction-humanoid-low-level-policy-2-02/itr_20000.pkl',
-            'multi-direction-humanoid-low-level-policy-2-03/itr_20000.pkl',
-            'multi-direction-humanoid-low-level-policy-2-04/itr_20000.pkl',
-        ]
+        'low_level_policy_path': ['/home/rcorona/sac/data/humanoid-rllab/default-humanoid_base-00/itr_0.pkl']
+            #'multi-direction-humanoid-low-level-policy-2-00/itr_20000.pkl',
+            #'multi-direction-humanoid-low-level-policy-2-01/itr_20000.pkl',
+            #'multi-direction-humanoid-low-level-policy-2-02/itr_20000.pkl',
+            #'multi-direction-humanoid-low-level-policy-2-03/itr_20000.pkl',
+            #'multi-direction-humanoid-low-level-policy-2-04/itr_20000.pkl',
+            #]
     },
     'ant-resume-training': {  # 8 DoF
         'prefix': 'ant-resume-training',
@@ -249,7 +249,7 @@ RLLAB_ENVS = {
 
 def run_experiment(variant):
     low_level_policy = load_low_level_policy(
-        policy_path=variant['low_level_policy_path'])
+        policy_path='/home/rcorona/sac/data/humanoid-rllab/default-humanoid_base-00/itr_0.pkl')#variant['low_level_policy_path'])
 
     env_name = variant['env_name']
     env_type = env_name.split('-')[-1]
