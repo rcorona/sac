@@ -10,7 +10,7 @@ REPARAMETERIZE = True
 LSP_POLICY_PARAMS_BASE = {
     'type': 'lsp',
     'coupling_layers': 2,
-    's_t_layers': 2,
+    's_t_layers': 1,
     'action_prior': 'uniform',
     # 'preprocessing_hidden_sizes': None,
     'preprocessing_output_nonlinearity': 'relu',
@@ -213,39 +213,39 @@ ALGORITHM_PARAMS = {
         }
     },
     'hopper': { # 3 DoF
-        'scale_reward': 5,
+        'scale_reward': 1,
         'base_kwargs': {
             'n_epochs': 1e3,
         }
     },
     'half-cheetah': { # 6 DoF
-        'scale_reward': 5,
+        'scale_reward': 1,
         'base_kwargs': {
             'n_epochs': 3e3,
             'n_initial_exploration_steps': 10000,
         }
     },
     'walker': { # 6 DoF
-        'scale_reward': 5,
+        'scale_reward': 3,
         'base_kwargs': {
             'n_epochs': 1e3,
         }
     },
     'ant': { # 8 DoF
-        'scale_reward': 5,
+        'scale_reward': 3,
         'base_kwargs': {
             'n_epochs': 3e3,
             'n_initial_exploration_steps': 10000,
         }
     },
     'humanoid-gym': { # 17 DoF
-        'scale_reward': 20,
+        'scale_reward': 2,
         'base_kwargs': {
             'n_epochs': 1e4,
         }
     },
     'humanoid-rllab': { # 21 DoF
-        'scale_reward': 10,
+        'scale_reward': 3,
         'base_kwargs': {
             'n_epochs': 1e4,
         }
