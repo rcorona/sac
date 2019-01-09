@@ -15,6 +15,8 @@ from rllab.envs.mujoco.humanoid_env import HumanoidEnv
 from rllab.misc.instrument import VariantGenerator
 from rllab import config
 
+sys.path.insert(0, '/home/rcorona/sac/')
+
 from sac.algos import SAC
 from sac.envs import (
     GymEnv,
@@ -31,7 +33,6 @@ from sac.misc.sampler import SimpleSampler
 from sac.replay_buffers import SimpleReplayBuffer
 from sac.value_functions import NNQFunction, NNVFunction
 from sac.preprocessors import MLPPreprocessor
-sys.path.insert(0,'/home/rcorona/sac/')
 from examples.variants import parse_domain_and_task, get_variants
 
 ENVIRONMENTS = {
