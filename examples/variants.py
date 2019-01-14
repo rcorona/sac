@@ -192,7 +192,7 @@ ALGORITHM_PARAMS_BASE = {
     'lr': 3e-4,
     'discount': 0.99,
     'target_update_interval': 1,
-    'tau': 0.005,
+    'tau': 1e-2,
     'reparameterize': REPARAMETERIZE,
 
     'base_kwargs': {
