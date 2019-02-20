@@ -267,8 +267,10 @@ def run_experiment(variant):
         raise NotImplementedError
 
     base_env = normalize(EnvClass(**env_args))
-    env = HierarchyProxyEnv(wrapped_env=base_env,
-                            low_level_policy=low_level_policy)
+    env = base_env
+    #env = HierarchyProxyEnv(wrapped_env=base_env,
+    #                        low_level_policy=low_level_policy)
+
     pool = SimpleReplayBuffer(
         env_spec=env.spec,
         max_replay_buffer_size=variant['max_pool_size'],
