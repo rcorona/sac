@@ -11,6 +11,8 @@ from rllab.envs.mujoco.ant_env import AntEnv
 from rllab.envs.mujoco.humanoid_env import HumanoidEnv
 from rllab.misc.instrument import VariantGenerator
 
+sys.path.insert(0, '/home/rcorona/sac/')
+
 from sac.algos import SAC
 # from sac.envs import (
 #     RandomGoalAntEnv, HierarchyProxyEnv)
