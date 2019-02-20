@@ -1,7 +1,7 @@
 import argparse
 import joblib
 import os
-
+import sys
 import tensorflow as tf
 import numpy as np
 
@@ -18,7 +18,7 @@ from sac.algos import SAC
 #     RandomGoalAntEnv, HierarchyProxyEnv)
 from sac.misc.instrument import run_sac_experiment
 from sac.misc.utils import timestamp
-from sac.policies import LatentSpacePolicy
+from sac.policies import LatentSpacePolicy, UniformPolicy
 from sac.misc.sampler import SimpleSampler
 from sac.replay_buffers import SimpleReplayBuffer
 from sac.value_functions import NNQFunction, NNVFunction
@@ -147,7 +147,7 @@ ENV_PARAMS = {
         'prefix': 'ant-resume-training',
         'env_name': 'ant-rllab',
         'max_path_length': 1000,
-        'n_epochs': int(4e3 + 1),
+        'n_epochs': 10000,
         'scale_reward': 3.0,
 
         'preprocessing_hidden_sizes': (128, 128, 16),
@@ -250,8 +250,8 @@ RLLAB_ENVS = {
 
 
 def run_experiment(variant):
-    low_level_policy = load_low_level_policy(
-        policy_path='/home/rcorona/sac/data/humanoid-rllab/default-humanoid_base-00/itr_0.pkl')#variant['low_level_policy_path'])
+    #low_level_policy = load_low_level_policy(
+    #    policy_path='/home/rcorona/sac/data/humanoid-rllab/default-humanoid_base-00/itr_0.pkl')#variant['low_level_policy_path'])
 
     env_name = variant['env_name']
     env_type = env_name.split('-')[-1]
@@ -295,8 +295,11 @@ def run_experiment(variant):
     )
 
     M = variant['layer_size']
-    qf = NNQFunction(env_spec=env.spec, hidden_layer_sizes=(M, M))
+    qf1 = NNQFunction(env_spec=env.spec, hidden_layer_sizes=(M, M), name='qf1')
+    qf2 = NNQFunction(env_spec=env.spec, hidden_layer_sizes=(M, M), name='qf2')
     vf = NNVFunction(env_spec=env.spec, hidden_layer_sizes=(M, M))
+
+    initial_exploration_policy = UniformPolicy(env_spec=env.spec)
 
     preprocessing_hidden_sizes = variant.get('preprocessing_hidden_sizes')
     observations_preprocessor = (
@@ -323,7 +326,7 @@ def run_experiment(variant):
         mode="train",
         squash=False,
         bijector_config=bijector_config,
-        q_function=qf,
+        q_function=qf1,
         fix_h_on_reset=variant.get('policy_fix_h_on_reset', False),
         observations_preprocessor=observations_preprocessor,
         name="high_level_policy"
@@ -334,16 +337,16 @@ def run_experiment(variant):
         env=env,
         policy=policy,
         pool=pool,
-        qf=qf,
+        qf1=qf1,
         vf=vf,
-
+        qf2=qf2,
         lr=variant['lr'],
         scale_reward=variant['scale_reward'],
         discount=variant['discount'],
         tau=variant['tau'],
         target_update_interval=variant['target_update_interval'],
         action_prior=variant['action_prior'],
-
+        initial_exploration_policy=initial_exploration_policy,
         save_full_state=False,
     )
 
@@ -378,6 +381,8 @@ def launch_experiments(variant_generator):
             snapshot_gap=variant['snapshot_gap'],
             sync_s3_pkl=variant['sync_pkl'],
         )
+
+        sys.exit()
 
 if __name__ == '__main__':
     args = parse_args()
